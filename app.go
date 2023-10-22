@@ -48,8 +48,19 @@ func (a *App) ProjectInfoList() ([]ProjectInfo, error) {
 		return nil, err
 	}
 
-	// TODO: mac only
-	path := filepath.Join(home, "Library/Application Support/Code/User/workspaceStorage")
+	var path string
+	if runtime.GOOS == "windows" {
+		appdataPath, exists := os.LookupEnv("APPDATA")
+
+		if !exists {
+			return nil, fmt.Errorf("APPDATA environment variable not found")
+		}
+
+		path = filepath.Join(appdataPath, "\\Code\\User\\workspaceStorage")
+	} else {
+		path = filepath.Join(home, "Library/Application Support/Code/User/workspaceStorage")
+	}
+
 	dirs, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil, err
@@ -176,12 +187,11 @@ func (a *App) UpdateWorkspaceRecommendationsIgnore(projectList []ProjectInfo) {
 	wg.Wait()
 }
 
-// TODO: mac only
 func (a *App) OpenDir(path string) error {
 	var cmd *exec.Cmd
 
 	if runtime.GOOS == "windows" {
-		// TODO
+		cmd = exec.Command("start", path)
 		return nil
 	} else {
 		cmd = exec.Command("open", path)
