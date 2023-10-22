@@ -192,7 +192,6 @@ func (a *App) OpenDir(path string) error {
 
 	if runtime.GOOS == "windows" {
 		cmd = exec.Command("start", path)
-		return nil
 	} else {
 		cmd = exec.Command("open", path)
 	}
