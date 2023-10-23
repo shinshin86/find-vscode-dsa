@@ -8,11 +8,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 	"sync"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -86,9 +88,18 @@ func (a *App) ProjectInfoList() ([]ProjectInfo, error) {
 			}
 
 			projectPath, ok := jsonContent["folder"].(string)
+
 			if !ok {
 				log.Println("Could not find 'projectPath' key in JSON from file:", workspaceJSONPath)
 				continue
+			}
+
+			if runtime.GOOS == "windows" {
+				projectPath, err = convertWinFilePath(projectPath)
+				if err != nil {
+					log.Println("Could not convert projectPath at Windows: ", err)
+					continue
+				}
 			}
 
 			vscodeWorkspaceStoragePathAbs, err := filepath.Abs(filepath.Join(path, dir.Name()))
@@ -204,4 +215,23 @@ func (a *App) OpenDir(path string) error {
 	}
 
 	return nil
+}
+
+func convertWinFilePath(filePath string) (string, error) {
+	u, err := url.Parse(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	path, err := url.PathUnescape(u.Path)
+	if err != nil {
+		return "", err
+	}
+	path = strings.TrimPrefix(path, "/")
+
+	path = strings.Replace(path, "c:/", "C:/", 1)
+
+	result := strings.ReplaceAll(path, "/", "//")
+
+	return result, nil
 }
