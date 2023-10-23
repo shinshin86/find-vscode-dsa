@@ -191,7 +191,8 @@ func (a *App) OpenDir(path string) error {
 	var cmd *exec.Cmd
 
 	if runtime.GOOS == "windows" {
-		cmd = exec.Command("start", path)
+		args := []string{"/c", "start", path}
+		cmd = exec.Command("cmd", args...)
 	} else {
 		cmd = exec.Command("open", path)
 	}
