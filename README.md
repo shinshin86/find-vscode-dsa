@@ -2,6 +2,17 @@
 
 Find the VSCode project you `don't show again`.
 
+
+## Development
+
+### Windows
+
+Windows environment requires setup before using go-sqlite3
+
+Reference: https://github.com/mattn/go-sqlite3#windows
+
+Before starting the application, please download and install tdm-gcc-webdl.exe from [this page](https://jmeubank.github.io/tdm-gcc/download/).
+
 ------------------
 
 # README
